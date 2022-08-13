@@ -137,8 +137,7 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
-        return false;
+        return gameConditionExists(b, 0);
     }
 
     /**
@@ -147,9 +146,49 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        return gameConditionExists(b, 1);
+    }
+
+    /** Helper function to determine game condition
+     *
+     * @param b is a Board state
+     * @param n if n == 0, check if any tile is empty
+     *          if n == 1, check if any tile == MAX_PIECE
+     *          if n == 2, check if adjacent tiles are equal
+     * @return  bool
+     */
+    public static boolean gameConditionExists(Board b, int n) {
+        for (int col = 0; col < b.size(); col++) {
+            for (int row = 0; row < b.size(); row++) {
+                if (n == 0) {
+                    if (b.tile(col, row) == null) {
+                        return true;
+                    }
+                } else if (n == 1) {
+                    if (b.tile(col, row) == null) continue;
+                    if (b.tile(col, row).value() == MAX_PIECE) {
+                        return true;
+                    }
+                } else if (n == 2) {
+                    int current = b.tile(col, row).value();
+                    if (isValidTile(b, col + 1, row)) {
+                        int right = b.tile(col + 1, row).value();
+                        if (current == right) {
+                            return true;
+                        }
+                    }
+                    if (isValidTile(b, col, row + 1)) {
+                        int below = b.tile(col, row + 1).value();
+                        if (current == below) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
+
 
     /**
      * Returns true if there are any valid moves on the board.
@@ -158,10 +197,18 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        if (emptySpaceExists(b)) return true;
+        if (gameConditionExists(b, 2)) return true;
         return false;
     }
 
+    public static boolean isValidTile(Board b, int col, int row) {
+        if (col < 0 || col >= b.size() || row < 0 || row >= b.size()) {
+            return false;
+        }
+        return true;
+
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
