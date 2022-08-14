@@ -132,8 +132,8 @@ public class Model extends Observable {
                         this.board.move(col, row, this.board.tile(col, curr_row));
                         this.score += this.board.tile(col, row).value();
                         changed = true;
-                        break;
                     }
+                    break;
                 }
             }
         }
