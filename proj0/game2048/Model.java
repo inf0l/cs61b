@@ -110,14 +110,36 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
-        // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
         this.board.setViewingPerspective(side);
 
-
+        for (int row = this.board.size() - 1; row > 0; row--) {
+            for (int col = 0; col < this.board.size(); col++) {
+                int curr_row = row;
+                if (this.board.tile(col, row) == null) {
+                    while (curr_row > 0) {
+                        curr_row--;
+                        if (this.board.tile(col, curr_row) != null) {
+                            this.board.move(col, row, this.board.tile(col, curr_row));
+                            changed = true;
+                            break;
+                        }
+                    }
+                }
+                while (curr_row > 0) {
+                    curr_row--;
+                    if (this.board.tile(col, curr_row) == null) continue;
+                    if (this.board.tile(col, curr_row).value() == this.board.tile(col, row).value()) {
+                        this.board.move(col, row, this.board.tile(col, curr_row));
+                        this.score += this.board.tile(col, row).value();
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
 
         this.board.setViewingPerspective(Side.NORTH);
+
         checkGameOver();
         if (changed) {
             setChanged();
@@ -171,10 +193,12 @@ public class Model extends Observable {
                     case "equal":   if (b.tile(col, row) == null) continue;
                                     int current = b.tile(col, row).value();
                                     if (isValidTile(b, col + 1, row)) {
+                                        if (b.tile(col + 1, row) == null) continue;
                                         int right = b.tile(col + 1, row).value();
                                         if (current == right) return true;
                                     }
                                     if (isValidTile(b, col, row + 1)) {
+                                        if (b.tile(col, row + 1) == null) continue;
                                         int above = b.tile(col, row + 1).value();
                                         if (current == above) return true;
                                     }
